@@ -1,33 +1,38 @@
+"""
+Copyright (c) 2023 Geovanni Santamaria. All Rights Reserved.
+"""
+import json
+from datetime import datetime
+
+from brightness import Brightness
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from dbusmain import main
 
-
-class Monitor(FileSystemEventHandler, main):
+class Monitor(FileSystemEventHandler, Brightness):
     def on_modified(self, event):
-        super().on_modified(event)
-        return self.write_file()
+        if event.is_directory:
+            return
 
-    def write_file(self):
-        brightness = self.getTimeValue()
-        default_file = open(self.logfile.joinpath(brightness), "w")
-        default_file.write(self.getBrightnessValue())
-        default_file.close()
+        # with open(self.json_file, "r") as json_file:
+        #     data = json.load(json_file)
+        data = self.timeformat()
+        data[self.current_time] = self.brightness()
+        with open(self.json_file, "w") as json_file:
+            json.dump(data, json_file)
+        # currentime_file = self.logs / self.timeformat()
+        # if not currentime_file.exists():
+        #     currentime_file.touch()
+        # currentime_file.write_text(self.brightness())
 
 
-def run():
-    path = Monitor().path
-    event_handler = Monitor()
-    observer = Observer()
-    observer.schedule(event_handler, path, recursive=True)
-    observer.start()
-    try:
-        while observer.is_alive():
-            observer.join()
-    except KeyboardInterrupt:
-        observer.stop()
+path = "/sys/class/backlight/amdgpu_bl1/brightness"
+
+event_handler = Monitor()
+observer = Observer()
+observer.schedule(event_handler, path, recursive=True)
+observer.start()
+try:
     observer.join()
-
-
-run()
+except KeyboardInterrupt:
+    observer.stop()
