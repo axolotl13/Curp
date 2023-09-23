@@ -20,17 +20,14 @@ class Switcher(Brightness):
 
     def on(self):
         try:
-            brightness = int(self.brightness())
-            currentime_file = self.logs / self.timeformat()
-            if not currentime_file.exists():
-                currentime_file.touch()
-            value_file = int(currentime_file.read_text())
+            brightness = self.brightness()
+            value_file = int(self.timeformat())
+            print(f"value_file{value_file}, brightness{brightness}")
             screen = self.screen
-            value_file = round(value_file / 5) * 5
+            # value_file = round(value_file / 5) * 5
             self.adjust_brightness(screen, brightness, value_file)
         except ValueError:
-            print("No se encontro valor")
+            print("No values found")
 
 
-runner = Switcher()
-runner.on()
+Switcher().on()
