@@ -6,6 +6,7 @@ of the Interior of the United Mexican States.
 from datetime import date, datetime
 
 from unidecode import unidecode
+
 from utils import entities, prepositions, profanities
 
 
@@ -350,7 +351,7 @@ class Generator:
             + self._century()
         )
 
-    def _verification_digit(self):
+    def _verification_digit(self) -> str:
         """
         Calculates the verification digit.
 
@@ -360,21 +361,24 @@ class Generator:
         abc = "0123456789abcdefghijklmn~opqrstuvwxyz"
         curp = self._group_all()
         xurp = [abc.find(value) for value in reversed(curp + "0")]
-        suma = ((sum((n + 1) * xurp[n] for n, _ in enumerate(curp)) % 10) - 10) * -1
-        result = suma if suma != 10 else 0
+        _sum = ((sum((n + 1) * l for n, l in enumerate(xurp)) % 10) - 10) * -1
+        result = _sum if _sum != 10 else 0
         return curp + str(result)
 
     def printer(self):
+        """
+        Print Data
+        """
         print(
             f"""\n
 + + + + + + + + + + + + + + + + + +
 +       {self._verification_digit().upper()}        +
 + + + + + + + + + + + + + + + + + +
-          Name:{self.name}
-      Lastname:{self.lastname}
-      Lastname:{self.mlastname}
-     Birthdate:{self._birthdate()}
-        Gender:{self.gender}
-         State:{self.state}
+          Name: {self.name}
+      Lastname: {self.lastname}
+      Lastname: {self.mlastname}
+     Birthdate: {self._birthdate()}
+        Gender: {self.gender}
+         State: {self.state}
 + + + + + + + + + + + + + + + + + +"""
         )
