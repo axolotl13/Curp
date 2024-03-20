@@ -97,7 +97,7 @@ class Generator:
         Returns:
             str: A string that has been filtered.
         """
-        cleaned = filter(lambda value: not (value in prepositions.prep), value.split())
+        cleaned = filter(lambda value: value not in prepositions.prep, value.split())
         return " ".join(list(cleaned))
 
     def _data(self) -> dict:
@@ -165,7 +165,7 @@ class Generator:
             # vowels = vowels.union("-", "/", ".")
             search = filter(lambda letter: letter in vowels, value)
         else:
-            search = filter(lambda letter: not (letter in vowels), value)
+            search = filter(lambda letter: letter not in vowels, value)
         return next(search, "x")
 
     @special_character
@@ -333,7 +333,7 @@ class Generator:
         Returns:
             str: Zero if not within range
         """
-        return "1" if self.year in range(2001, 2100) else "0"
+        return "a" if self.year in range(2001, 2100) else "0"
 
     def _group_all(self) -> str:
         """
@@ -358,11 +358,11 @@ class Generator:
         Returns:
             str: Concatenate CURP and the verification digit.
         """
-        abc = "0123456789abcdefghijklmn~opqrstuvwxyz"
+        abc = "0123456789abcdefghijklmn&opqrstuvwxyz ñ"
         curp = self._group_all()
         xurp = [abc.find(value) for value in reversed(curp + "0")]
-        _sum = ((sum((n + 1) * l for n, l in enumerate(xurp)) % 10) - 10) * -1
-        result = _sum if _sum != 10 else 0
+        residue = sum((x + 1) * y for x, y in enumerate(xurp)) % 10
+        result = 10 - residue if residue != 10 else 0
         return curp + str(result)
 
     def printer(self):
